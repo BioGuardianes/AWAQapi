@@ -36,7 +36,7 @@ namespace bioguardianes_api.Controllers
             {
                 while (reader.Read())
                 {
-                    res = Convert.ToInt32(reader["biomonitor_id"]);
+                    res = Convert.ToInt32(reader[isAdmin ? "administrador_id" : "biomonitor_id"]);
                 }
             }
             connection.Dispose();
@@ -68,8 +68,7 @@ namespace bioguardianes_api.Controllers
                         Apellidos = reader["apellidos"]?.ToString() ?? "NULL",
                         Correo = reader["correo"]?.ToString() ?? "NULL",
                         Telefono = reader["telefono"]?.ToString() ?? "NULL",
-                        // FIXME
-                        //FechaNacimiento = DateOnly.Parse(reader["fecha_nacimiento"]?.ToString() ?? "01-01-0001"),
+                        FechaNacimiento = DateOnly.ParseExact(reader["fecha_nacimiento"]?.ToString() ?? "01-01-2000", "dd-MM-yyyy", System.Globalization.CultureInfo.InvariantCulture),
                         Ciudad = reader["ciudad"]?.ToString() ?? "NULL",
                         Estado = Convert.ToBoolean(reader["estado"])
                     };
@@ -106,8 +105,7 @@ namespace bioguardianes_api.Controllers
                         Apellidos = reader["apellidos"]?.ToString() ?? "NULL",
                         Correo = reader["correo"]?.ToString() ?? "NULL",
                         Telefono = reader["telefono"]?.ToString() ?? "NULL",
-                        // FIXME
-                        //FechaNacimiento = DateOnly.Parse(reader["fecha_nacimiento"]?.ToString() ?? "01-01-0001"),
+                        FechaNacimiento = DateOnly.ParseExact(reader["fecha_nacimiento"]?.ToString() ?? "01-01-2000", "dd-MM-yyyy", System.Globalization.CultureInfo.InvariantCulture),
                         Ciudad = reader["ciudad"]?.ToString() ?? "NULL",
                         Estado = Convert.ToBoolean(reader["estado"])
                     };
@@ -151,75 +149,6 @@ namespace bioguardianes_api.Controllers
 
             return listaNivelBiomonitor;
         }
-
-        //[HttpPut("updateStars/{biomonitor_id}/{nivel_id}")]
-        //public void PutEstrellas(int biomonitor_id, int nivel_id, [FromQuery] int estrellas = 0)
-        //{
-        //    MySqlConnection connection = new MySqlConnection(connectionString);
-        //    connection.Open();
-        //    MySqlCommand cmd = new MySqlCommand();
-        //    cmd.CommandType = CommandType.StoredProcedure;
-        //    cmd.Connection = connection;
-        //    cmd.CommandText = "force_update_biomonitor_level_stars";
-        //    cmd.Parameters.AddWithValue("@biomonitor_id", biomonitor_id);
-        //    cmd.Parameters.AddWithValue("@nivel_id", nivel_id);
-        //    cmd.Parameters.AddWithValue("@estrellas", estrellas);
-
-        //    cmd.ExecuteNonQuery();
-        //    connection.Dispose();
-        //}
-
-        //[HttpPut("updatePercentage/{biomonitor_id}/{nivel_id}")]
-        //public void PutPorcentaje(int biomonitor_id, int nivel_id, [FromQuery] int porcentaje = 0)
-        //{
-        //    MySqlConnection connection = new MySqlConnection(connectionString);
-        //    connection.Open();
-        //    MySqlCommand cmd = new MySqlCommand();
-        //    cmd.CommandType = CommandType.StoredProcedure;
-        //    cmd.Connection = connection;
-        //    cmd.CommandText = "update_biomonitor_level_percentage";
-        //    cmd.Parameters.AddWithValue("@biomonitor_id", biomonitor_id);
-        //    cmd.Parameters.AddWithValue("@nivel_id", nivel_id);
-        //    cmd.Parameters.AddWithValue("@estrellas", porcentaje);
-
-        //    cmd.ExecuteNonQuery();
-        //    connection.Dispose();
-        //}
-
-        //[HttpPut("updateBadge/{biomonitor_id}/{nivel_id}")]
-        //public void PutInsignia(int biomonitor_id, int nivel_id, [FromQuery] bool insignia = false)
-        //{
-        //    MySqlConnection connection = new MySqlConnection(connectionString);
-        //    connection.Open();
-        //    MySqlCommand cmd = new MySqlCommand();
-        //    cmd.CommandType = CommandType.StoredProcedure;
-        //    cmd.Connection = connection;
-        //    cmd.CommandText = "update_biomonitor_level_badge";
-        //    cmd.Parameters.AddWithValue("@biomonitor_id", biomonitor_id);
-        //    cmd.Parameters.AddWithValue("@nivel_id", nivel_id);
-        //    cmd.Parameters.AddWithValue("@insignia", insignia);
-
-        //    cmd.ExecuteNonQuery();
-        //    connection.Dispose();
-        //}
-
-        //[HttpPut("forceTime/{biomonitor_id}/{nivel_id}")]
-        //public void PutTiempo(int biomonitor_id, int nivel_id, [FromQuery] int tiempo_dedicado = 0)
-        //{
-        //    MySqlConnection connection = new MySqlConnection(connectionString);
-        //    connection.Open();
-        //    MySqlCommand cmd = new MySqlCommand();
-        //    cmd.CommandType = CommandType.StoredProcedure;
-        //    cmd.Connection = connection;
-        //    cmd.CommandText = "force_update_biomonitor_level_time";
-        //    cmd.Parameters.AddWithValue("@biomonitor_id", biomonitor_id);
-        //    cmd.Parameters.AddWithValue("@nivel_id", nivel_id);
-        //    cmd.Parameters.AddWithValue("@tiempo_dedicado", tiempo_dedicado);
-
-        //    cmd.ExecuteNonQuery();
-        //    connection.Dispose();
-        //}
-
         [HttpPut("updateLevel/{biomonitor_id}/{nivel_id}")]
         public void PutLevel(int biomonitor_id, int nivel_id, [FromQuery] int estrellas = 0, [FromQuery] double porcentaje = 0,[FromQuery] int tiempo_dedicado = 0, [FromQuery] bool insignia = false)
         {
@@ -239,7 +168,6 @@ namespace bioguardianes_api.Controllers
             cmd.ExecuteNonQuery();
             connection.Dispose();
         }
-
 
     }
 }
