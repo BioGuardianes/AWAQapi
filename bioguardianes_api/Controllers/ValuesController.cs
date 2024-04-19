@@ -7,6 +7,7 @@ using System.Formats.Asn1;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -16,7 +17,21 @@ namespace bioguardianes_api.Controllers
 {
     public class ValuesController : Controller
     {
-        private readonly string connectionString = "Server=localhost;Port=3306;Database=SistemaBiomonitores;Uid=root;";
+        private IConfiguration configuration;
+        private string? connectionString;
+        public ValuesController(IConfiguration iConfig)
+        {
+            configuration = iConfig;
+            if (configuration.GetSection("ConnectionString").Value  == null )
+            {
+                throw new Exception("appsettings.json does not contain 'ConnectionString' key");
+            } 
+            else
+            {
+                connectionString = configuration.GetSection("ConnectionString").Value;
+            }
+        }
+
 
         [HttpGet("signin")]
         public int? GetSignIn([FromQuery]string correo, [FromQuery] string contrasena, [FromQuery] bool isAdmin = false)
@@ -140,7 +155,8 @@ namespace bioguardianes_api.Controllers
                         Estrellas = Convert.ToInt32(reader["estrellas"]),
                         Insignia = Convert.ToBoolean(reader["insignia"]),
                         TiempoDedicado = Convert.ToInt32(reader["tiempo_dedicado"]),
-                        PorcentajeDeTrivia = Convert.ToDouble(reader["porcentaje_de_trivia"])
+                        PorcentajeDeTrivia = Convert.ToDouble(reader["porcentaje_de_trivia"]),
+                        TutorialCompletado = Convert.ToInt32(reader["tutorial_completado"])
                     };
                     listaNivelBiomonitor.Add(nivelBiomonitor);
                 }
@@ -150,7 +166,7 @@ namespace bioguardianes_api.Controllers
             return listaNivelBiomonitor;
         }
         [HttpPut("updateLevel/{biomonitor_id}/{nivel_id}")]
-        public void PutLevel(int biomonitor_id, int nivel_id, [FromQuery] int estrellas = 0, [FromQuery] double porcentaje = 0,[FromQuery] int tiempo_dedicado = 0, [FromQuery] bool insignia = false)
+        public void PutLevel(int biomonitor_id, int nivel_id, [FromQuery] int estrellas = 0, [FromQuery] double porcentaje = 0,[FromQuery] int tiempo_dedicado = 0, [FromQuery] bool insignia = false, [FromQuery] bool tutorial_completado = false)
         {
             MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
@@ -164,6 +180,7 @@ namespace bioguardianes_api.Controllers
             cmd.Parameters.AddWithValue("@porcentaje", porcentaje);
             cmd.Parameters.AddWithValue("@tiempo_dedicado", tiempo_dedicado);
             cmd.Parameters.AddWithValue("@insignia", insignia);
+            cmd.Parameters.AddWithValue("@tutorial_completado", tutorial_completado);
 
             cmd.ExecuteNonQuery();
             connection.Dispose();

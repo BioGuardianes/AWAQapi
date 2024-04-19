@@ -53,6 +53,7 @@ namespace bioguardianes_api
         public bool Insignia { get; set; }
         public int TiempoDedicado { get; set; }
         public double PorcentajeDeTrivia { get; set; }
+        public int TutorialCompletado { get; set; }
 
         public NivelBiomonitor()
         {
@@ -62,6 +63,7 @@ namespace bioguardianes_api
             this.Insignia = false;
             this.TiempoDedicado = 0;
             this.PorcentajeDeTrivia = 0.0;
+            this.TutorialCompletado = 0;
         }
 
     }
