@@ -67,5 +67,42 @@ namespace bioguardianes_api
         }
 
     }
+
+    public class Especie
+    {
+        public int EspecieId { get; set; }
+        public string NombreComun { get; set; }
+        public string Descripcion { get; set; }
+        public string Foto { get; set; }
+        public string NombreCientifico { get; set; }
+        public string Canto { get; set; }
+        public string HabitosAlimenticios { get; set; }
+        public string Habitat {  get; set; }
+        public float PesoPromedio { get; set; }
+        public string DescripcionComportamiento { get; set; }
+        public string Dieta {  get; set; }
+        public string Tipo {  get; set; }
+        public string Clima {  get; set; }
+
+
+        public Especie()
+        {
+            this.EspecieId = 0;
+            this.NombreComun = "";
+            this.Descripcion = "";
+            this.Foto = "";
+            this.NombreCientifico = "";
+            this.Canto = "";
+            this.HabitosAlimenticios = "";
+            this.Habitat = "";
+            this.PesoPromedio = 0;
+            this.DescripcionComportamiento = "";
+            this.Dieta = "";
+            this.Tipo = "";
+            this.Clima = "";
+        }
+
+    }
+
 }
 

@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Formats.Asn1;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -186,6 +187,85 @@ namespace bioguardianes_api.Controllers
             connection.Dispose();
         }
 
+        [HttpGet("especies")]
+        public IEnumerable<Especie> GetSpecies()
+        {
+            MySqlConnection connection = new(connectionString);
+            connection.Open();
+            MySqlCommand cmd = new();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Connection = connection;
+            cmd.CommandText = "get_species";
+
+            List<Especie> especies = new();
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    Especie especie = new Especie
+                    {
+                        EspecieId = Convert.ToInt32(reader["id_especie"]),
+                        NombreComun = reader["nombre_comun"] is DBNull ? "NULL" : Convert.ToString(reader["nombre_comun"]),
+                        Descripcion = reader["descripcion"] is DBNull ? "NULL" : Convert.ToString(reader["descripcion"]),
+                        Foto = reader["foto"] is DBNull ? "NULL" : Convert.ToString(reader["foto"]),
+                        NombreCientifico = reader["nombre_cientifico"] is DBNull ? "NULL" : Convert.ToString(reader["nombre_cientifico"]),
+                        Canto = reader["canto"] is DBNull ? "NULL" : Convert.ToString(reader["canto"]),
+                        HabitosAlimenticios = reader["habitos_alimenticios"] is DBNull ? "NULL" : Convert.ToString(reader["habitos_alimenticios"]),
+                        Habitat = reader["habitat"] is DBNull ? "NULL" : Convert.ToString(reader["habitat"]),
+                        PesoPromedio = reader["peso_promedio"] is DBNull ? 0 : Convert.ToInt32(reader["peso_promedio"]),
+                        DescripcionComportamiento = reader["descripcion_comportamiento"] is DBNull ? "NULL" : Convert.ToString(reader["descripcion_comportamiento"]),
+                        Dieta = reader["dieta"] is DBNull ? "NULL" : Convert.ToString(reader["dieta"]),
+                        Tipo = reader["tipo"] is DBNull ? "NULL" : Convert.ToString(reader["tipo"]),
+                        Clima = reader["clima"] is DBNull ? "NULL" : Convert.ToString(reader["clima"])
+                    };
+                    especies.Add(especie);
+                }
+            }
+            connection.Dispose();
+
+            return especies;
+        }
+
+        [HttpGet("especie/{TipoEspecie}")]
+        public Especie GetSpecie(string TipoEspecie)
+        {
+            MySqlConnection connection = new(connectionString);
+            connection.Open();
+            MySqlCommand cmd = new();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Connection = connection;
+            cmd.CommandText = "get_specie_by_type";
+            cmd.Parameters.AddWithValue("@TipoEspecie", TipoEspecie);
+
+            Especie especie = new();
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    especie = new()
+                    {
+                        EspecieId = Convert.ToInt32(reader["id_especie"]),
+                        NombreComun = reader["nombre_comun"]?.ToString() ?? "NULL",
+                        Descripcion = reader["descripcion"]?.ToString() ?? "NULL",
+                        Foto = reader["foto"]?.ToString() ?? "NULL",
+                        NombreCientifico = reader["nombre_cientifico"]?.ToString() ?? "NULL",
+                        Canto = reader["canto"]?.ToString() ?? "NULL",
+                        HabitosAlimenticios = reader["habitos_alimenticios"]?.ToString() ?? "NULL",
+                        Habitat = reader["habitat"]?.ToString() ?? "NULL",
+                        PesoPromedio = Convert.ToInt32(reader["peso_promedio"]),
+                        DescripcionComportamiento = reader["descripcion_comportamiento"]?.ToString() ?? "NULL",
+                        Dieta = reader["dieta"]?.ToString() ?? "NULL",
+                        Tipo = reader["tipo"]?.ToString() ?? "NULL",
+                        Clima = reader["clima"]?.ToString() ?? "NULL",
+                    };
+                }
+            }
+            connection.Dispose();
+
+            return especie;
+        }
     }
 }
 
