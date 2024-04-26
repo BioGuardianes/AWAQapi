@@ -228,7 +228,7 @@ namespace bioguardianes_api.Controllers
         }
 
         [HttpGet("especie/{TipoEspecie}")]
-        public Especie GetSpecie(string TipoEspecie)
+        public IEnumerable<Especie> GetSpecie(string TipoEspecie)
         {
             MySqlConnection connection = new(connectionString);
             connection.Open();
@@ -238,33 +238,35 @@ namespace bioguardianes_api.Controllers
             cmd.CommandText = "get_specie_by_type";
             cmd.Parameters.AddWithValue("@TipoEspecie", TipoEspecie);
 
+            List<Especie> especies = new();
             Especie especie = new();
 
             using (var reader = cmd.ExecuteReader())
             {
                 while (reader.Read())
                 {
-                    especie = new()
+                    especie = new Especie
                     {
                         EspecieId = Convert.ToInt32(reader["id_especie"]),
-                        NombreComun = reader["nombre_comun"]?.ToString() ?? "NULL",
-                        Descripcion = reader["descripcion"]?.ToString() ?? "NULL",
-                        Foto = reader["foto"]?.ToString() ?? "NULL",
-                        NombreCientifico = reader["nombre_cientifico"]?.ToString() ?? "NULL",
-                        Canto = reader["canto"]?.ToString() ?? "NULL",
-                        HabitosAlimenticios = reader["habitos_alimenticios"]?.ToString() ?? "NULL",
-                        Habitat = reader["habitat"]?.ToString() ?? "NULL",
-                        PesoPromedio = Convert.ToInt32(reader["peso_promedio"]),
-                        DescripcionComportamiento = reader["descripcion_comportamiento"]?.ToString() ?? "NULL",
-                        Dieta = reader["dieta"]?.ToString() ?? "NULL",
-                        Tipo = reader["tipo"]?.ToString() ?? "NULL",
-                        Clima = reader["clima"]?.ToString() ?? "NULL",
+                        NombreComun = reader["nombre_comun"] is DBNull ? "NULL" : Convert.ToString(reader["nombre_comun"]),
+                        Descripcion = reader["descripcion"] is DBNull ? "NULL" : Convert.ToString(reader["descripcion"]),
+                        Foto = reader["foto"] is DBNull ? "NULL" : Convert.ToString(reader["foto"]),
+                        NombreCientifico = reader["nombre_cientifico"] is DBNull ? "NULL" : Convert.ToString(reader["nombre_cientifico"]),
+                        Canto = reader["canto"] is DBNull ? "NULL" : Convert.ToString(reader["canto"]),
+                        HabitosAlimenticios = reader["habitos_alimenticios"] is DBNull ? "NULL" : Convert.ToString(reader["habitos_alimenticios"]),
+                        Habitat = reader["habitat"] is DBNull ? "NULL" : Convert.ToString(reader["habitat"]),
+                        PesoPromedio = reader["peso_promedio"] is DBNull ? 0 : Convert.ToInt32(reader["peso_promedio"]),
+                        DescripcionComportamiento = reader["descripcion_comportamiento"] is DBNull ? "NULL" : Convert.ToString(reader["descripcion_comportamiento"]),
+                        Dieta = reader["dieta"] is DBNull ? "NULL" : Convert.ToString(reader["dieta"]),
+                        Tipo = reader["tipo"] is DBNull ? "NULL" : Convert.ToString(reader["tipo"]),
+                        Clima = reader["clima"] is DBNull ? "NULL" : Convert.ToString(reader["clima"])
                     };
+                    especies.Add(especie);
                 }
             }
             connection.Dispose();
 
-            return especie;
+            return especies;
         }
     }
 }
