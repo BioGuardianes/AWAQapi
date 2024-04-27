@@ -33,10 +33,37 @@ namespace bioguardianes_api.Controllers
             }
         }
 
+        public bool CheckExpiration(int biomonitor_id)
+        {
+            //check_deactivate
+            MySqlConnection connection = new(connectionString);
+            connection.Open();
+            MySqlCommand cmd = new();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Connection = connection;
+            cmd.CommandText = ("check_deactivate");
+            cmd.Parameters.AddWithValue("@biomonitor_id", biomonitor_id);
+
+            // Define the output parameter for estado
+            MySqlParameter outputParam = new("@estado", MySqlDbType.Bit)
+            {
+                Direction = ParameterDirection.Output
+            };
+            cmd.Parameters.Add(outputParam);
+
+            cmd.ExecuteNonQuery();
+
+            // Retrieve the value of the output parameter after executing the command
+            bool estado = Convert.ToBoolean(cmd.Parameters["@estado"].Value);
+            connection.Dispose();
+            return estado;
+        }
+
 
         [HttpGet("signin")]
         public int? GetSignIn([FromQuery]string correo, [FromQuery] string contrasena, [FromQuery] bool isAdmin = false)
         {
+
             MySqlConnection connection = new(connectionString);
             connection.Open();
             MySqlCommand cmd = new();
@@ -53,6 +80,13 @@ namespace bioguardianes_api.Controllers
                 while (reader.Read())
                 {
                     res = Convert.ToInt32(reader[isAdmin ? "administrador_id" : "biomonitor_id"]);
+                    if (!isAdmin)
+                    {
+                        if (!CheckExpiration(res.Value))
+                        {
+                            res = null;
+                        }
+                    }
                 }
             }
             connection.Dispose();
@@ -77,6 +111,10 @@ namespace bioguardianes_api.Controllers
                 while (reader.Read())
                 {
                     res = Convert.ToInt32(reader["biomonitor_id"]);
+                    if (!CheckExpiration(res.Value))
+                    {
+                        res = null;
+                    }
                 }
             }
             connection.Dispose();
