@@ -59,6 +59,110 @@ namespace bioguardianes_api.Controllers
             return res;
         }
 
+        public int? GetSignInBiomonitor(string correo, string contrasena)
+        {
+            MySqlConnection connection = new(connectionString);
+            connection.Open();
+            MySqlCommand cmd = new();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Connection = connection;
+            cmd.CommandText = "biomonitor_sign_in";
+
+            cmd.Parameters.AddWithValue("@correo", correo);
+            cmd.Parameters.AddWithValue("@contrasena", contrasena);
+            int? res = null;
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    res = Convert.ToInt32(reader["biomonitor_id"]);
+                }
+            }
+            connection.Dispose();
+            return res;
+        }
+
+        public int? GetSignInAdmin(string correo, string contrasena)
+        {
+            MySqlConnection connection = new(connectionString);
+            connection.Open();
+            MySqlCommand cmd = new();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Connection = connection;
+            cmd.CommandText = "admin_sign_in";
+
+            cmd.Parameters.AddWithValue("@correo", correo);
+            cmd.Parameters.AddWithValue("@contrasena", contrasena);
+            int? res = null;
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    res = Convert.ToInt32(reader["administrador_id"]);
+                }
+            }
+            connection.Dispose();
+            return res;
+        }
+
+        
+        [HttpGet("signin_dashboard")]
+        public SigninDashboard? GetSignInDashboard([FromQuery] string correo, [FromQuery] string contrasena)
+        {
+            int? id = null;
+            if ((id = GetSignInAdmin(correo, contrasena)).HasValue)
+            {
+                return new()
+                {
+                    id = id.Value,
+                    type = true
+                };
+            }
+            if ((id = GetSignInBiomonitor(correo, contrasena)).HasValue)
+            {
+                return new()
+                {
+                    id = id.Value,
+                    type = false
+                };
+            }
+            return null;
+        }
+
+        [HttpGet("biomonitores_by_score")]
+        public IEnumerable<BiomonitorScore> GetBiomonitoresByScore([FromQuery] int administrador_id)
+        {
+            MySqlConnection connection = new(connectionString);
+            connection.Open();
+            MySqlCommand cmd = new();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Connection = connection;
+            cmd.CommandText = "get_biomonitores_by_score";
+            cmd.Parameters.AddWithValue("@administrador_id", administrador_id);
+
+
+            List<BiomonitorScore> biomonitors = new();
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    BiomonitorScore biomonitor = new()
+                    {
+                        BiomonitorId = Convert.ToInt32(reader["biomonitor_id"]),
+                        Puntuacion = Convert.ToInt32(reader["puntuacion"]),
+                        Nombre = reader["nombre"]?.ToString() ?? "NULL",
+                    };
+                    biomonitors.Add(biomonitor);
+                }
+            }
+            connection.Dispose();
+
+            return biomonitors;
+        }
+
         [HttpGet("biomonitores")]
         public IEnumerable<Biomonitor> GetBiomonitores()
         {
@@ -95,6 +199,44 @@ namespace bioguardianes_api.Controllers
 
             return biomonitors;
         }
+
+        [HttpGet("biomonitores/{administrador_id}")]
+        public IEnumerable<BiomonitorItem> GetBiomonitores(int administrador_id, [FromQuery] string search_string = "")
+        {
+            MySqlConnection connection = new(connectionString);
+            connection.Open();
+            MySqlCommand cmd = new();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Connection = connection;
+            cmd.CommandText = "get_biomonitores_by_administrador";
+            cmd.Parameters.AddWithValue("@administrador_id", administrador_id);
+            cmd.Parameters.AddWithValue("@search_string", search_string);
+
+
+            List<BiomonitorItem> biomonitors = new();
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    BiomonitorItem biomonitor = new()
+                    {
+                        Id = Convert.ToInt32(reader["id"]),
+                        Nombre = reader["nombre"]?.ToString() ?? "NULL",
+                        Correo = reader["correo"]?.ToString() ?? "NULL",
+                        Telefono = reader["telefono"]?.ToString() ?? "NULL",
+                        Ciudad = reader["ciudad"]?.ToString() ?? "NULL",
+                        Edad = Convert.ToInt32(reader["edad"])
+                    };
+                    biomonitors.Add(biomonitor);
+                }
+            }
+            connection.Dispose();
+
+            return biomonitors;
+        }
+
+
 
         [HttpGet("biomonitor/{biomonitor_id}")]
         public Biomonitor GetBiomonitor(int biomonitor_id)
@@ -182,6 +324,21 @@ namespace bioguardianes_api.Controllers
             cmd.Parameters.AddWithValue("@tiempo_dedicado", tiempo_dedicado);
             cmd.Parameters.AddWithValue("@insignia", insignia);
             cmd.Parameters.AddWithValue("@tutorial_completado", tutorial_completado);
+
+            cmd.ExecuteNonQuery();
+            connection.Dispose();
+        }
+
+        [HttpPut("deactivate_biomonitor")]
+        public void DeactivateBiomonitor([FromBody] int biomonitor_id)
+        {
+            MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Connection = connection;
+            cmd.CommandText = "deactivate_biomonitor";
+            cmd.Parameters.AddWithValue("@biomonitor_id", biomonitor_id);
 
             cmd.ExecuteNonQuery();
             connection.Dispose();

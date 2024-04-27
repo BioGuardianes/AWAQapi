@@ -116,5 +116,52 @@ namespace bioguardianes_api
 
     }
 
+
+    public class SigninDashboard
+    {
+        public int id { get; set; }
+        public bool type { get; set; }
+
+        public SigninDashboard()
+        {
+            this.id = 0;
+            this.type = false;
+        }
+    }
+
+    public class BiomonitorScore
+    {
+        public int BiomonitorId { get; set; }
+        public string Nombre { get; set; }
+        public int Puntuacion { get; set; }
+
+        public BiomonitorScore()
+        {
+            this.BiomonitorId = 0;
+            this.Nombre = "";
+            this.Puntuacion = 0;
+        }
+    }
+
+    public class BiomonitorItem
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; }
+        public string Correo { get; set; }
+        public string Telefono { get; set; }
+        public string Ciudad { get; set; }
+        public int Edad { get; set; }
+
+        public BiomonitorItem()
+        {
+            this.Id = 0;
+            this.Nombre = "John";
+            this.Correo = "place@holder.com";
+            this.Telefono = "0123456789";
+            this.Ciudad = "MTY";
+            this.Edad = 0;
+        }
+
+    }
 }
 
