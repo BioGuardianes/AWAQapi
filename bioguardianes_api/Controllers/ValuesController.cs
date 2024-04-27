@@ -308,6 +308,52 @@ namespace bioguardianes_api.Controllers
 
             return especie;
         }
+
+        [HttpPost("registrar_biomonitor")]
+        public void RegisterBiomonitor([FromBody] Biomonitor bm)
+        {
+            MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Connection = connection;
+            cmd.CommandText = "registrar_biomonitor";
+
+            cmd.Parameters.AddWithValue("@_administrador_id", bm.AdministradorId);
+            cmd.Parameters.AddWithValue("@_nombre", bm.Nombre);
+            cmd.Parameters.AddWithValue("@_apellidos", bm.Apellidos);
+            cmd.Parameters.AddWithValue("@_correo", bm.Correo);
+            cmd.Parameters.AddWithValue("@_telefono", bm.Telefono);
+            cmd.Parameters.AddWithValue("@_fechaNacimiento", bm.FechaNacimiento);
+            cmd.Parameters.AddWithValue("@_ciudad", bm.Ciudad);
+
+            cmd.ExecuteReader();
+
+            connection.Dispose();
+        }
+
+        [HttpPost("registrar_biomonitor_sin_admin")]
+        public void RegisterBiomonitorNoAdmin([FromBody] Biomonitor bm)
+        {
+			MySqlConnection connection = new MySqlConnection(connectionString);
+			connection.Open();
+			MySqlCommand cmd = new MySqlCommand();
+			cmd.CommandType = CommandType.StoredProcedure;
+			cmd.Connection = connection;
+			cmd.CommandText = "registrar_biomonitor";
+
+			cmd.Parameters.AddWithValue("@_administrador_id", 7);
+			cmd.Parameters.AddWithValue("@_nombre", bm.Nombre);
+			cmd.Parameters.AddWithValue("@_apellidos", bm.Apellidos);
+			cmd.Parameters.AddWithValue("@_correo", bm.Correo);
+			cmd.Parameters.AddWithValue("@_telefono", bm.Telefono);
+			cmd.Parameters.AddWithValue("@_fechaNacimiento", bm.FechaNacimiento);
+			cmd.Parameters.AddWithValue("@_ciudad", bm.Ciudad);
+
+			cmd.ExecuteReader();
+
+			connection.Dispose();
+		}
     }
 }
 
