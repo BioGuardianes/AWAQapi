@@ -84,7 +84,7 @@ namespace bioguardianes_api.Controllers
                         Apellidos = reader["apellidos"]?.ToString() ?? "NULL",
                         Correo = reader["correo"]?.ToString() ?? "NULL",
                         Telefono = reader["telefono"]?.ToString() ?? "NULL",
-                        FechaNacimiento = DateOnly.ParseExact(reader["fecha_nacimiento"]?.ToString() ?? "01-01-2000", "dd-MM-yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                        FechaNacimiento = reader["fecha_nacimiento"]?.ToString() ?? "NULL",
                         Ciudad = reader["ciudad"]?.ToString() ?? "NULL",
                         Estado = Convert.ToBoolean(reader["estado"])
                     };
@@ -121,7 +121,7 @@ namespace bioguardianes_api.Controllers
                         Apellidos = reader["apellidos"]?.ToString() ?? "NULL",
                         Correo = reader["correo"]?.ToString() ?? "NULL",
                         Telefono = reader["telefono"]?.ToString() ?? "NULL",
-                        FechaNacimiento = DateOnly.ParseExact(reader["fecha_nacimiento"]?.ToString() ?? "01-01-2000", "dd-MM-yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                        FechaNacimiento = reader["fecha_nacimiento"]?.ToString() ?? "NULL",
                         Ciudad = reader["ciudad"]?.ToString() ?? "NULL",
                         Estado = Convert.ToBoolean(reader["estado"])
                     };
@@ -310,7 +310,7 @@ namespace bioguardianes_api.Controllers
         }
 
         [HttpPost("registrar_biomonitor")]
-        public void RegisterBiomonitor([FromBody] Biomonitor bm)
+        public int RegisterBiomonitor([FromBody] BiomonitorToRegister bm)
         {
             MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
@@ -326,21 +326,31 @@ namespace bioguardianes_api.Controllers
             cmd.Parameters.AddWithValue("@_telefono", bm.Telefono);
             cmd.Parameters.AddWithValue("@_fechaNacimiento", bm.FechaNacimiento);
             cmd.Parameters.AddWithValue("@_ciudad", bm.Ciudad);
+			cmd.Parameters.AddWithValue("@_contrasena", bm.Contrasena);
 
-            cmd.ExecuteReader();
+
+			int id;
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                reader.Read();
+                id = Convert.ToInt32(reader["biomonitor_id"]);
+            }
 
             connection.Dispose();
+
+            return id;
         }
 
         [HttpPost("registrar_biomonitor_sin_admin")]
-        public void RegisterBiomonitorNoAdmin([FromBody] Biomonitor bm)
+        public int RegisterBiomonitorNoAdmin([FromBody] BiomonitorToRegister bm)
         {
 			MySqlConnection connection = new MySqlConnection(connectionString);
 			connection.Open();
 			MySqlCommand cmd = new MySqlCommand();
 			cmd.CommandType = CommandType.StoredProcedure;
 			cmd.Connection = connection;
-			cmd.CommandText = "registrar_biomonitor";
+			cmd.CommandText = "registrar_biomonitor_temporal";
 
 			cmd.Parameters.AddWithValue("@_administrador_id", 7);
 			cmd.Parameters.AddWithValue("@_nombre", bm.Nombre);
@@ -349,10 +359,19 @@ namespace bioguardianes_api.Controllers
 			cmd.Parameters.AddWithValue("@_telefono", bm.Telefono);
 			cmd.Parameters.AddWithValue("@_fechaNacimiento", bm.FechaNacimiento);
 			cmd.Parameters.AddWithValue("@_ciudad", bm.Ciudad);
+			cmd.Parameters.AddWithValue("@_contrasena", bm.Contrasena);
 
-			cmd.ExecuteReader();
+			int id;
+
+			using (var reader = cmd.ExecuteReader())
+			{
+				reader.Read();
+				id = Convert.ToInt32(reader["biomonitor_id"]);
+			}
 
 			connection.Dispose();
+
+            return id;
 		}
     }
 }

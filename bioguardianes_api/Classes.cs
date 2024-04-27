@@ -18,6 +18,18 @@ namespace bioguardianes_api
 
     }
 
+    public class BiomonitorToRegister
+    {
+		public int AdministradorId { get; set; }
+		public string Nombre { get; set; }
+		public string Apellidos { get; set; }
+		public string Correo { get; set; }
+		public string Telefono { get; set; }
+		public string FechaNacimiento { get; set; }
+		public string Ciudad { get; set; }
+		public string Contrasena { get; set; }
+	}
+
     public class Biomonitor
     {
         public int BiomonitorId { get; set; }
@@ -26,7 +38,7 @@ namespace bioguardianes_api
         public string Apellidos { get; set; }
         public string Correo { get; set; }
         public string Telefono { get; set; }
-        public DateOnly FechaNacimiento { get; set; }
+        public string FechaNacimiento { get; set; }
         public string Ciudad { get; set; }
         public bool Estado { get; set; }
 
@@ -38,7 +50,7 @@ namespace bioguardianes_api
             this.Apellidos = "Doe";
             this.Correo = "place@holder.com";
             this.Telefono = "0123456789";
-            this.FechaNacimiento = DateOnly.MinValue;
+            this.FechaNacimiento = "01-01-2000";
             this.Ciudad = "MTY";
             this.Estado = false;
         }
