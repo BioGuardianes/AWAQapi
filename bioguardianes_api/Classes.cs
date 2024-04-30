@@ -145,7 +145,7 @@ namespace bioguardianes_api
 
     public class BiomonitorItem
     {
-        public int Id { get; set; }
+        public int BiomonitorId { get; set; }
         public string Nombre { get; set; }
         public string Correo { get; set; }
         public string Telefono { get; set; }
@@ -154,7 +154,7 @@ namespace bioguardianes_api
 
         public BiomonitorItem()
         {
-            this.Id = 0;
+            this.BiomonitorId = 0;
             this.Nombre = "John";
             this.Correo = "place@holder.com";
             this.Telefono = "0123456789";

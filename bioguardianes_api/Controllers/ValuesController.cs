@@ -259,7 +259,7 @@ namespace bioguardianes_api.Controllers
                 {
                     BiomonitorItem biomonitor = new()
                     {
-                        Id = Convert.ToInt32(reader["id"]),
+                        BiomonitorId = Convert.ToInt32(reader["id"]),
                         Nombre = reader["nombre"]?.ToString() ?? "NULL",
                         Correo = reader["correo"]?.ToString() ?? "NULL",
                         Telefono = reader["telefono"]?.ToString() ?? "NULL",
